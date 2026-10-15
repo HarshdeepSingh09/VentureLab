@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  Calculator, RotateCcw, AlertTriangle, CheckCircle2, Scale, Info
-} from 'lucide-react';
-import type { BudgetAllocation, ChallengeOptionId } from '../types';
 
+  Calculator, RotateCcw, AlertTriangle, CheckCircle2, Scale, Info,
+  Plus, Minus
+} from 'lucide-react';
+
+import type { BudgetAllocation, ChallengeOptionId } from '../types';
 
 const INITIAL_BUDGET = 100000;
 
@@ -27,19 +29,21 @@ export const MiniDemoSection: React.FC = () => {
   const remainingBudget = INITIAL_BUDGET - totalAllocated;
 
   const handleSliderChange = (field: keyof BudgetAllocation, requestedValue: number) => {
-    // Current value for this field
     const currentVal = allocation[field];
-    // Remaining available outside this field
     const otherAllocations = totalAllocated - currentVal;
     const maxPermitted = INITIAL_BUDGET - otherAllocations;
-
-    // Prevent spending beyond the available budget
     const clampedValue = Math.max(0, Math.min(requestedValue, maxPermitted));
 
     setAllocation(prev => ({
       ...prev,
       [field]: clampedValue,
     }));
+  };
+
+  const handleStepAdjust = (field: keyof BudgetAllocation, delta: number) => {
+    const currentVal = allocation[field];
+    const nextVal = currentVal + delta;
+    handleSliderChange(field, nextVal);
   };
 
   const resetSimulation = () => {
@@ -58,6 +62,38 @@ export const MiniDemoSection: React.FC = () => {
   const getPercentage = (amount: number) => {
     return ((amount / INITIAL_BUDGET) * 100).toFixed(0);
   };
+
+  // Strategic classification based on allocation balance
+  const getStrategyProfile = () => {
+    if (allocation.operations >= 40000) {
+      return {
+        label: 'Fulfilment-First Strategy',
+        desc: 'Prioritizes food quality, thermal insulation, and delivery punctuality over rapid user acquisition.',
+        color: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/50',
+      };
+    }
+    if (allocation.marketing >= 35000) {
+      return {
+        label: 'Growth-First Strategy',
+        desc: 'Prioritizes brand visibility and early campus sign-ups, accepting tighter operational margins.',
+        color: 'text-cyan-400 bg-cyan-950/60 border-cyan-800/50',
+      };
+    }
+    if (allocation.emergencyReserve >= 25000) {
+      return {
+        label: 'Defensive & Cash-Resilient',
+        desc: 'Maintains heavy contingency cushion to absorb unforeseen inflation and supply disruptions.',
+        color: 'text-amber-400 bg-amber-950/60 border-amber-800/50',
+      };
+    }
+    return {
+      label: 'Balanced Venture Model',
+      desc: 'Distributes capital prudently across tech, acquisition, kitchen logistics, and contingency.',
+      color: 'text-indigo-400 bg-indigo-950/60 border-indigo-800/50',
+    };
+  };
+
+  const currentStrategy = getStrategyProfile();
 
   return (
     <section id="mini-demo" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
@@ -94,14 +130,19 @@ export const MiniDemoSection: React.FC = () => {
                 Initial Working Capital Allocation
               </h3>
             </div>
-            <button
-              onClick={resetSimulation}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-slate-700/80 transition-colors"
-              title="Reset allocations to default"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-              Reset
-            </button>
+            <div className="flex items-center gap-2">
+              <span className={`text-[11px] font-mono px-2.5 py-1 rounded-full border ${currentStrategy.color}`}>
+                {currentStrategy.label}
+              </span>
+              <button
+                onClick={resetSimulation}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-slate-700/80 transition-colors"
+                title="Reset allocations to default"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+                Reset
+              </button>
+            </div>
           </div>
 
           {/* Budget Overview KPI Banner */}
@@ -164,7 +205,7 @@ export const MiniDemoSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Sliders Grid */}
+          {/* Sliders Grid with Stepper Buttons */}
           <div className="space-y-4">
             {/* Slider 1: Product Development */}
             <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
@@ -175,9 +216,27 @@ export const MiniDemoSection: React.FC = () => {
                     Product Development
                   </label>
                 </div>
-                <span className="text-sm font-mono font-bold text-indigo-400">
-                  {formatRupees(allocation.productDevelopment)} ({getPercentage(allocation.productDevelopment)}%)
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleStepAdjust('productDevelopment', -2500)}
+                    disabled={allocation.productDevelopment <= 0}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Decrease product budget"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-sm font-mono font-bold text-indigo-400 min-w-28 text-right">
+                    {formatRupees(allocation.productDevelopment)} ({getPercentage(allocation.productDevelopment)}%)
+                  </span>
+                  <button
+                    onClick={() => handleStepAdjust('productDevelopment', 2500)}
+                    disabled={remainingBudget < 2500}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Increase product budget"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
               <input
                 id="productDevSlider"
@@ -205,9 +264,27 @@ export const MiniDemoSection: React.FC = () => {
                     Marketing & Acquisition
                   </label>
                 </div>
-                <span className="text-sm font-mono font-bold text-cyan-400">
-                  {formatRupees(allocation.marketing)} ({getPercentage(allocation.marketing)}%)
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleStepAdjust('marketing', -2500)}
+                    disabled={allocation.marketing <= 0}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Decrease marketing budget"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-sm font-mono font-bold text-cyan-400 min-w-28 text-right">
+                    {formatRupees(allocation.marketing)} ({getPercentage(allocation.marketing)}%)
+                  </span>
+                  <button
+                    onClick={() => handleStepAdjust('marketing', 2500)}
+                    disabled={remainingBudget < 2500}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Increase marketing budget"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
               <input
                 id="marketingSlider"
@@ -235,9 +312,27 @@ export const MiniDemoSection: React.FC = () => {
                     Operations & Fulfilment
                   </label>
                 </div>
-                <span className="text-sm font-mono font-bold text-emerald-400">
-                  {formatRupees(allocation.operations)} ({getPercentage(allocation.operations)}%)
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleStepAdjust('operations', -2500)}
+                    disabled={allocation.operations <= 0}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Decrease operations budget"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-sm font-mono font-bold text-emerald-400 min-w-28 text-right">
+                    {formatRupees(allocation.operations)} ({getPercentage(allocation.operations)}%)
+                  </span>
+                  <button
+                    onClick={() => handleStepAdjust('operations', 2500)}
+                    disabled={remainingBudget < 2500}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Increase operations budget"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
               <input
                 id="operationsSlider"
@@ -265,9 +360,27 @@ export const MiniDemoSection: React.FC = () => {
                     Emergency Contingency Reserve
                   </label>
                 </div>
-                <span className="text-sm font-mono font-bold text-amber-400">
-                  {formatRupees(allocation.emergencyReserve)} ({getPercentage(allocation.emergencyReserve)}%)
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleStepAdjust('emergencyReserve', -2500)}
+                    disabled={allocation.emergencyReserve <= 0}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Decrease reserve budget"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-sm font-mono font-bold text-amber-400 min-w-28 text-right">
+                    {formatRupees(allocation.emergencyReserve)} ({getPercentage(allocation.emergencyReserve)}%)
+                  </span>
+                  <button
+                    onClick={() => handleStepAdjust('emergencyReserve', 2500)}
+                    disabled={remainingBudget < 2500}
+                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 transition-colors"
+                    aria-label="Increase reserve budget"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
               <input
                 id="emergencyReserveSlider"
@@ -403,12 +516,71 @@ export const MiniDemoSection: React.FC = () => {
 
             {/* Educational Trade-off Analysis */}
             {selectedDecision ? (
-              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-cyan-400" />
-                  <h5 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                    Pedagogical Trade-off Analysis (Option {selectedDecision})
-                  </h5>
+              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Scale className="w-4 h-4 text-cyan-400" />
+                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                      Pedagogical Trade-off Analysis (Option {selectedDecision})
+                    </h5>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
+                    Simulation Feedback Loop
+                  </span>
+                </div>
+
+                {/* Simulated Outcome Gauges */}
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block mb-0.5">Fulfilment SLA</span>
+                    <span
+                      className={`font-mono font-bold ${
+                        selectedDecision === 'A'
+                          ? 'text-emerald-400'
+                          : selectedDecision === 'B'
+                          ? 'text-cyan-400'
+                          : 'text-rose-400'
+                      }`}
+                    >
+                      {selectedDecision === 'A' ? '98.5%' : selectedDecision === 'B' ? '96.0%' : '71.2%'}
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block mb-0.5">CSAT Sentiment</span>
+                    <span
+                      className={`font-mono font-bold ${
+                        selectedDecision === 'A'
+                          ? 'text-emerald-400'
+                          : selectedDecision === 'B'
+                          ? 'text-violet-400'
+                          : 'text-rose-400'
+                      }`}
+                    >
+                      {selectedDecision === 'A' ? '4.8 / 5.0' : selectedDecision === 'B' ? '4.4 / 5.0' : '2.6 / 5.0'}
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                    <span className="text-[10px] text-slate-400 block mb-0.5">Cash Cushion</span>
+                    <span
+                      className={`font-mono font-bold ${
+                        selectedDecision === 'A'
+                          ? allocation.emergencyReserve > 15000
+                            ? 'text-cyan-400'
+                            : 'text-amber-400'
+                          : selectedDecision === 'B'
+                          ? 'text-emerald-400'
+                          : 'text-amber-400'
+                      }`}
+                    >
+                      {selectedDecision === 'A'
+                        ? `₹${Math.max(0, allocation.emergencyReserve - 10000).toLocaleString('en-IN')}`
+                        : selectedDecision === 'B'
+                        ? `₹${allocation.emergencyReserve.toLocaleString('en-IN')}`
+                        : `₹${(allocation.emergencyReserve + 8000).toLocaleString('en-IN')}`}
+                    </span>
+                  </div>
                 </div>
 
                 {selectedDecision === 'A' && (

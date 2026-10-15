@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { 
   Building2, Mail, User, MapPin, Briefcase, MessageSquare, 
-  CheckCircle2, ArrowRight, ShieldCheck, RotateCcw 
+  CheckCircle2, ArrowRight, ShieldCheck, RotateCcw, Copy
 } from 'lucide-react';
 import type { PartnershipFormData } from '../types';
-
 
 export const PartnershipSection: React.FC = () => {
   // Engagement type switcher
   const [activeTab, setActiveTab] = useState<'discuss' | 'pilot'>('pilot');
+  const [copied, setCopied] = useState(false);
+
 
   const [formData, setFormData] = useState<PartnershipFormData>({
     fullName: '',
@@ -234,13 +235,27 @@ export const PartnershipSection: React.FC = () => {
               📌 <strong>Next Step:</strong> As part of our exploratory validation phase, our product design lead will reach out to schedule a brief 20-minute exploratory video call to understand your school&rsquo;s specific requirements.
             </div>
 
-            <button
-              onClick={handleReset}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Submit Another Inquiry
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(submittedData.referenceId);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-950 text-cyan-300 border border-cyan-800 hover:bg-cyan-900/60 text-xs font-semibold transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                {copied ? 'Copied to Clipboard!' : 'Copy Reference ID'}
+              </button>
+
+              <button
+                onClick={handleReset}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Submit Another Inquiry
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate className="space-y-5">

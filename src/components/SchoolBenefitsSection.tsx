@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Users, School, MessageSquareText, Monitor, CheckCircle2, 
-  GraduationCap, HeartHandshake 
+  GraduationCap, HeartHandshake, Clock, Calendar, Trophy 
 } from 'lucide-react';
 
 
 export const SchoolBenefitsSection: React.FC = () => {
+  const [activeModality, setActiveModality] = useState<number>(0);
+
   const features = [
     {
       icon: Users,
@@ -38,6 +40,39 @@ export const SchoolBenefitsSection: React.FC = () => {
       description:
         'The platform is being designed for cloud-based browser access across standard computer labs, laptops, desktops, and compatible tablets. No expensive VR headsets, specialized game consoles, or complex installations required.',
       curriculumFit: 'Frictionless school IT lab deployment',
+    },
+  ];
+
+  const modalities = [
+    {
+      icon: Clock,
+      title: 'Standard 40-Minute Class Period',
+      tagline: 'Fits seamlessly into standard school timetables',
+      breakdown: [
+        { time: '00–10 min', phase: 'Context & Scenario Briefing', detail: 'Educator introduces the economic constraint or customer dilemma.' },
+        { time: '10–30 min', phase: 'Active Student Simulation', detail: 'Students independently or in pairs test pricing, allocate budget, and execute choices.' },
+        { time: '30–40 min', phase: 'Guided Classroom Debrief', detail: 'Teacher reviews cross-classroom consequence metrics and highlights core principles.' },
+      ],
+    },
+    {
+      icon: Calendar,
+      title: 'Commerce & Innovation Club Sprints',
+      tagline: 'Weekly 60–90 min co-curricular sessions',
+      breakdown: [
+        { time: 'Week 1–2', phase: 'Customer Discovery & Ideation', detail: 'Students evaluate simulated campus problems and craft differentiated value propositions.' },
+        { time: 'Week 3–4', phase: 'Unit Economics & Capital Testing', detail: 'Multi-round working capital iterations and unexpected business challenge responses.' },
+        { time: 'Week 5', phase: 'Venture Showcase Pitch Day', detail: 'Teams present interactive pitch decks evaluated by faculty and guest alumni mentors.' },
+      ],
+    },
+    {
+      icon: Trophy,
+      title: 'Annual School Entrepreneurship Day',
+      tagline: 'Inter-house or inter-school innovation competition',
+      breakdown: [
+        { time: 'Session 1', phase: 'Venture Incubation Marathon', detail: 'Concurrent student teams simulate competing against market disruptions in real time.' },
+        { time: 'Session 2', phase: 'Boardroom Defense & Reasoning', detail: 'Students justify their financial runway resilience and operational pivot strategies.' },
+        { time: 'Session 3', phase: 'Awards & Feedback Ceremony', detail: 'Recognition for best risk management, highest CSAT, and disciplined capital allocation.' },
+      ],
     },
   ];
 
@@ -87,6 +122,59 @@ export const SchoolBenefitsSection: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Classroom Timetable Integration Modalities */}
+      <div className="mb-16 glass-panel rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+          <div>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider block">
+              Flexible Implementation Formats
+            </span>
+            <h3 className="text-xl font-bold text-white">
+              How Schools Could Schedule the Experience
+            </h3>
+          </div>
+          {/* Modality switcher pills */}
+          <div className="flex flex-wrap gap-2">
+            {modalities.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveModality(idx)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                  activeModality === idx
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-700/60 shadow-sm'
+                    : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                }`}
+              >
+                {idx === 0 ? '40-Min Period' : idx === 1 ? 'Club Sprint' : 'Annual Bootcamp'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Selected Modality Detail */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            {React.createElement(modalities[activeModality].icon, { className: 'w-5 h-5 text-cyan-400' })}
+            <div>
+              <h4 className="text-base font-bold text-white">{modalities[activeModality].title}</h4>
+              <p className="text-xs text-slate-400">{modalities[activeModality].tagline}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {modalities[activeModality].breakdown.map((b, bIdx) => (
+              <div key={bIdx} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-1.5">
+                <span className="text-xs font-mono font-bold text-cyan-400 px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/50 inline-block">
+                  {b.time}
+                </span>
+                <h5 className="text-sm font-semibold text-slate-200 pt-1">{b.phase}</h5>
+                <p className="text-xs text-slate-400 leading-relaxed">{b.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* "Built With Educators, Not Just For Them" Callout Box */}
