@@ -1,212 +1,340 @@
 import React, { useState } from 'react';
 import { 
-  Lightbulb, Compass, FileSpreadsheet, Wallet, AlertTriangle, 
-  Presentation, CheckCircle2, ArrowLeft, ArrowRight,
-  Sparkles, Layers, BookOpen, type LucideIcon
+  Compass, Lightbulb, Hammer, Rocket, 
+  Swords, TrendingUp, Presentation, ArrowRight, 
+  CheckCircle2, ShieldCheck, Wallet, AlertTriangle, Users, BookOpen,
+  Gauge
 } from 'lucide-react';
-import { JOURNEY_STAGES } from '../data/journeyData';
-import { JourneyInteractivePreview } from './JourneyInteractivePreview';
+import type { SimulationLocationId } from '../simulation/types';
 
-export const JourneySection: React.FC = () => {
-  const [activeStageIndex, setActiveStageIndex] = useState(0);
-  const activeStage = JOURNEY_STAGES[activeStageIndex];
+interface JourneySectionProps {
+  onOpenSimulation: (locationId?: SimulationLocationId) => void;
+}
 
-  const stageIcons: Record<string, LucideIcon> = {
-    'stage-1': Compass,
-    'stage-2': Lightbulb,
-    'stage-3': FileSpreadsheet,
-    'stage-4': Wallet,
-    'stage-5': AlertTriangle,
-    'stage-6': Presentation,
-  };
+export const JourneySection: React.FC<JourneySectionProps> = ({ onOpenSimulation }) => {
+  const [activeStage, setActiveStage] = useState(0);
 
-  const ActiveIcon = stageIcons[activeStage.id] || Sparkles;
+  const stages = [
+    {
+      id: 'discover',
+      stepNum: '01',
+      title: 'DISCOVER',
+      subtitle: 'Identify Real Problems',
+      icon: Compass,
+      badge: 'Step 1: Empathy',
+      shortExpl: 'Investigate genuine customer friction points in a campus ecosystem before building a solution.',
+      decisionExample: 'Compare 3 pain points: Do hostellers struggle more with high meal prices (₹200/meal), delayed deliveries missing 35-min lecture breaks, or a lack of clean nutrition?',
+      takeaway: 'Great ventures start with urgent, recurring problems, not hypothetical assumptions.',
+      locationId: 'customer_discovery' as SimulationLocationId,
+      locationName: 'Customer Discovery Lab',
+      locationNumber: 'Stage 01',
+      simulatedScope: 'Problem Evaluation & Pain Point Matrix',
+      scopeDetails: 'Analyze campus problem statements using a 5-step evaluation framework (Clarity, Target, Frequency, Alternatives, Utility) before writing code.',
+      metrics: [
+        { label: 'Severity Rating', value: '5 / 5', change: 'High Friction' },
+        { label: 'Target Audience', value: '4,500', change: 'Undergraduates' },
+        { label: 'Pain Frequency', value: 'Daily', change: 'Lunch & Dinner' },
+      ],
+      ctaText: 'Enter Discovery Lab',
+    },
+    {
+      id: 'ideate',
+      stepNum: '02',
+      title: 'IDEATE',
+      subtitle: 'Design Value Propositions',
+      icon: Lightbulb,
+      badge: 'Step 2: Solution Architecture',
+      shortExpl: 'Explore potential business models and interview simulated customer personas to test enthusiasm.',
+      decisionExample: 'Choose your solution: A scheduled monthly prepaid meal subscription, a verified local home-cook marketplace, or a cafeteria group-discount app?',
+      takeaway: 'Different customer segments have conflicting needs. You cannot please everyone with one offering.',
+      locationId: 'customer_insights' as SimulationLocationId,
+      locationName: 'Customer Insights Lab',
+      locationNumber: 'Stage 02',
+      simulatedScope: 'Persona Interviews & Empathy Insights',
+      scopeDetails: 'Interview simulated student personas (Riya, Vikram, Dr. Sharma) to unearth genuine blockers, meal timing constraints, and price sensitivity.',
+      metrics: [
+        { label: 'Empathy Score', value: '88%', change: '+15% Insight' },
+        { label: 'Customer Personas', value: '3 Archetypes', change: 'Hostel & Day' },
+        { label: 'Willingness to Pay', value: '₹80–₹95', change: 'Sweet Spot' },
+      ],
+      ctaText: 'Enter Insights Lab',
+    },
+    {
+      id: 'build',
+      stepNum: '03',
+      title: 'BUILD',
+      subtitle: 'MVP Feature Scope & Intern Hire',
+      icon: Hammer,
+      badge: 'Step 3: MVP Design & Team',
+      shortExpl: 'Select core initial product features with limited development points, then recruit your first intern.',
+      decisionExample: 'Prioritize feature tradeoffs: Core batch ordering vs live GPS tracking. Then select an organised intern (Aarav), creative problem solver (Riya), or low-cost beginner (Kabir).',
+      takeaway: 'Starting with a focused MVP validates customer delight before exhausting scarce seed runway.',
+      locationId: 'product_dev' as SimulationLocationId,
+      locationName: 'Product Development Lab',
+      locationNumber: 'Stage 03',
+      simulatedScope: 'MVP Roadmap & Intern Hiring',
+      scopeDetails: 'Allocate 100 dev points and evaluate 3 distinct fictional intern candidates to carry forward downstream operational advantages.',
+      metrics: [
+        { label: 'Dev Points Pool', value: '100 Pts', change: 'Fixed Budget' },
+        { label: 'Intern Candidate', value: '3 Choices', change: 'Operations/Marketing' },
+        { label: 'MVP Complexity', value: 'Lean Scope', change: 'Zero Bloat' },
+      ],
+      ctaText: 'Enter Product Dev Lab',
+    },
+    {
+      id: 'finance',
+      stepNum: '04',
+      title: 'FINANCE',
+      subtitle: 'Budget & Unit Economics',
+      icon: Wallet,
+      badge: 'Step 4: Financial Planning',
+      shortExpl: 'Distribute ₹1,00,000 seed budget across product, marketing, operations, and cash emergency reserve.',
+      decisionExample: 'Negotiate with suppliers: Local peri-urban farm co-op vs cheap wholesale mandi liquidation vs organic growers.',
+      takeaway: 'Cash flow is the oxygen of a startup. Accounting profit is meaningless if your bank account hits zero.',
+      locationId: 'finance_center' as SimulationLocationId,
+      locationName: 'Finance Center',
+      locationNumber: 'Stage 04',
+      simulatedScope: 'Budget Allocation & Working Capital Ledger',
+      scopeDetails: 'Model unit gross margins (35%), calculate burn rate, and establish a minimum 6-week operating cash runway.',
+      metrics: [
+        { label: 'Starting Seed Capital', value: '₹1,00,000', change: 'Fixed Grant' },
+        { label: 'Gross Target Margin', value: '35%', change: 'Unit Economics' },
+        { label: 'Emergency Reserve', value: '₹15,000', change: 'Crisis Buffer' },
+      ],
+      ctaText: 'Enter Finance Center',
+    },
+    {
+      id: 'market',
+      stepNum: '05',
+      title: 'MARKET',
+      subtitle: 'Acquisition & Reach',
+      icon: Rocket,
+      badge: 'Step 5: Go-To-Market',
+      shortExpl: 'Deploy high-trust student acquisition channels: hostel ambassadors vs free tasting kiosks vs flyers.',
+      decisionExample: 'Calculate Customer Acquisition Cost: Ambassadors generate 4x higher retention than mass glossy flyers.',
+      takeaway: 'Acquiring customers is only half the battle; acquiring them within unit margin keeps you alive.',
+      locationId: 'marketing_studio' as SimulationLocationId,
+      locationName: 'Marketing Studio',
+      locationNumber: 'Stage 05',
+      simulatedScope: 'Channel Attribution & CAC Telemetry',
+      scopeDetails: 'Track customer conversion and word-of-mouth coefficients across campus living blocks.',
+      metrics: [
+        { label: 'CAC Efficiency', value: '₹28 / user', change: 'Low Cost' },
+        { label: 'Word of Mouth', value: '65%', change: 'Organic Pull' },
+        { label: 'Active Subscribers', value: '180 Pass', change: 'Batch Volume' },
+      ],
+      ctaText: 'Enter Marketing Studio',
+    },
+    {
+      id: 'operate',
+      stepNum: '06',
+      title: 'OPERATE',
+      subtitle: 'Manage Bottlenecks & Shocks',
+      icon: Gauge,
+      badge: 'Step 6: Crisis Operations',
+      shortExpl: 'Survive lunch rush bottlenecks where demand exceeds kitchen capacity by 50%, and navigate supply inflation.',
+      decisionExample: '35% ingredient price shock: Do you absorb the loss from reserve, hike student prices, or re-engineer the menu with seasonal produce?',
+      takeaway: 'Operational agility and ethical transparency build moats that competitors cannot copy.',
+      locationId: 'operations_center' as SimulationLocationId,
+      locationName: 'Operations Center',
+      locationNumber: 'Stage 06',
+      simulatedScope: 'Capacity Bottleneck & Crisis Dilemma',
+      scopeDetails: 'Manage daily prep throughput and resolve sudden dynamic business events deterministically.',
+      metrics: [
+        { label: 'Rush Throughput', value: '240 meals', change: 'Safe Capacity' },
+        { label: 'On-Time Rate', value: '98.5%', change: '35-min Window' },
+        { label: 'Reputation Score', value: '88 / 100', change: 'High Trust' },
+      ],
+      ctaText: 'Enter Operations Center',
+    },
+    {
+      id: 'pitch',
+      stepNum: '07',
+      title: 'PITCH',
+      subtitle: 'Final Presentation & Review',
+      icon: Presentation,
+      badge: 'Step 7: Capstone Defense',
+      shortExpl: 'Defend your business model, traction, and decision journal before the VentureLab investment committee.',
+      decisionExample: 'Defend expansion: Launch evening dinner passes to double LTV vs expand into neighboring campuses.',
+      takeaway: 'Great pitches are built on disciplined unit economics, validated customer empathy, and honest reflection.',
+      locationId: 'investor_arena' as SimulationLocationId,
+      locationName: 'Investor Arena',
+      locationNumber: 'Stage 07',
+      simulatedScope: 'Pitch Defense & Assessment Rubric',
+      scopeDetails: 'Receive a transparent 4-level rubric evaluation across problem, financial reasoning, decision-making, and ethics.',
+      metrics: [
+        { label: 'Investor Score', value: '92 / 100', change: 'Full Honors' },
+        { label: 'Unit Payback', value: '45 Days', change: 'Break-Even' },
+        { label: 'Decisions Logged', value: '11 Records', change: 'Full Journal' },
+      ],
+      ctaText: 'Enter Investor Arena',
+    },
+  ];
+
+  const current = stages[activeStage];
+  const CurrentIcon = current.icon;
 
   return (
-    <section id="journey" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
-      {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-96 bg-gradient-to-r from-blue-900/10 via-violet-900/15 to-cyan-900/10 blur-3xl pointer-events-none -z-10 rounded-full" />
-
+    <section id="the-journey" className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#F6F3EA] text-left">
+      
       {/* Section Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/60 text-xs font-semibold uppercase tracking-wider text-cyan-400 mb-4">
-          <Layers className="w-3.5 h-3.5" />
-          Structured Experiential Arc
+      <div className="max-w-3xl mb-12 space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E8F0EC] border border-[#C4D9CD] text-[11px] font-mono tracking-wider text-[#234B3A] uppercase font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Curriculum Journey &bull; Classes 9–12</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-4">
-          The Six-Stage Entrepreneurship Journey
+
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22251F] tracking-tight">
+          A Structured Entrepreneurship Lifecycle
         </h2>
-        <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
-          Students do not merely read business textbooks—they step into a progressive, connected venture lifecycle from initial observation through to executive pitching.
+
+        <p className="text-[#575952] text-base sm:text-lg leading-relaxed">
+          Students do not memorize business theory from slides. They progress through the authentic lifecycle of a student venture, making consequential resource decisions at every gate.
         </p>
       </div>
 
-      {/* Connected Journey Navigation Map (Horizontal on desktop, responsive scroll/pills on mobile) */}
-      <div className="mb-10">
-        <div className="relative">
-          {/* Connecting line behind icons on desktop */}
-          <div className="hidden lg:block absolute top-7 left-12 right-12 h-0.5 bg-slate-800 -z-0">
-            <div 
-              className="h-full bg-gradient-to-r from-cyan-500 via-violet-500 to-amber-500 transition-all duration-500"
-              style={{ width: `${(activeStageIndex / (JOURNEY_STAGES.length - 1)) * 100}%` }}
-            />
-          </div>
-
-          {/* Stepper buttons */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 relative z-10">
-            {JOURNEY_STAGES.map((stage, idx) => {
-              const isSelected = activeStageIndex === idx;
-              const isPassed = activeStageIndex > idx;
-              const Icon = stageIcons[stage.id] || Sparkles;
-
-              return (
-                <button
-                  key={stage.id}
-                  onClick={() => setActiveStageIndex(idx)}
-                  className={`group relative flex flex-col items-center p-3 sm:p-4 rounded-2xl transition-all duration-300 text-center border text-left ${
-                    isSelected
-                      ? 'bg-slate-900/90 border-cyan-500/80 shadow-xl shadow-cyan-950/40 scale-102 ring-1 ring-cyan-500/30'
-                      : isPassed
-                      ? 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700'
-                      : 'bg-slate-950/40 border-slate-900 text-slate-500 hover:border-slate-800 hover:text-slate-300'
-                  }`}
-                >
-                  <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center mb-2.5 transition-all ${
-                      isSelected
-                        ? 'bg-gradient-to-tr from-cyan-600 to-violet-600 text-white shadow-md shadow-cyan-900/50'
-                        : isPassed
-                        ? 'bg-slate-800 text-slate-300'
-                        : 'bg-slate-900 text-slate-500 group-hover:text-slate-300'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
+      {/* 7-Stage Horizontal Pipeline Navigation */}
+      <div className="mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+          {stages.map((stage, idx) => {
+            const Icon = stage.icon;
+            const isSelected = activeStage === idx;
+            return (
+              <button
+                key={stage.id}
+                onClick={() => setActiveStage(idx)}
+                className={`p-3 rounded-xl text-left transition-all cursor-pointer flex flex-col justify-between border ${
+                  isSelected
+                    ? 'bg-[#234B3A] text-[#F6F3EA] border-[#234B3A] shadow-sm'
+                    : 'bg-[#FFFFFF] border-[#D9D5C9] text-[#22251F] hover:bg-[#F0EDE4]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-[11px] font-mono font-bold ${isSelected ? 'text-[#F6F3EA]' : 'text-[#7E8078]'}`}>
+                    {stage.stepNum}
+                  </span>
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${isSelected ? 'bg-[#1A392C] text-[#F6F3EA]' : 'bg-[#F0EDE4] text-[#234B3A]'}`}>
+                    <Icon className="w-3.5 h-3.5" />
                   </div>
-                  <span
-                    className={`text-[10px] font-mono tracking-wider font-semibold mb-0.5 ${
-                      isSelected ? 'text-cyan-400' : 'text-slate-400'
-                    }`}
-                  >
-                    {stage.stageNumber}
-                  </span>
-                  <span
-                    className={`text-xs font-semibold line-clamp-1 ${
-                      isSelected ? 'text-white' : 'text-slate-400'
-                    }`}
-                  >
+                </div>
+                <div>
+                  <div className={`font-bold text-xs ${isSelected ? 'text-[#F6F3EA]' : 'text-[#22251F]'}`}>
                     {stage.title}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  </div>
+                  <div className={`text-[10px] truncate mt-0.5 ${isSelected ? 'text-[#D9D5C9]' : 'text-[#575952]'}`}>
+                    {stage.subtitle}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Active Stage Deep Dive Showcase */}
-      <div className="rounded-3xl glass-panel p-6 sm:p-8 lg:p-10 border border-slate-800 shadow-2xl relative overflow-hidden">
-        {/* Subtle decorative stage background watermark */}
-        <div className="absolute top-2 right-4 text-8xl font-black font-mono text-slate-900/40 select-none pointer-events-none">
-          {activeStage.stageNumber.replace('STAGE ', '')}
-        </div>
+      {/* Active Stage Detailed Breakdown Panel */}
+      <div className="card-clean p-6 sm:p-8 bg-[#FFFFFF] border border-[#D9D5C9]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Stage Decision Overview */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider text-[#234B3A] bg-[#E8F0EC] border border-[#C4D9CD]">
+                {current.badge}
+              </span>
+              <span className="text-xs font-mono text-[#7E8078]">
+                Stage {current.stepNum} of 07
+              </span>
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Column: Pedagogical Details & Concept */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-800/50 text-cyan-300 text-xs font-mono font-medium">
-                <ActiveIcon className="w-3.5 h-3.5" />
-                {activeStage.stageNumber} • {activeStage.tagline}
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#22251F] flex items-center gap-2.5">
+              <CurrentIcon className="w-6 h-6 text-[#234B3A]" />
+              <span>{current.title} &mdash; {current.subtitle}</span>
+            </h3>
+
+            <p className="text-[#575952] text-sm leading-relaxed">
+              {current.shortExpl}
+            </p>
+
+            {/* Decision Example Box */}
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#D9D5C9] space-y-1.5">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-[#234B3A] font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Example Decision Students Make:</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {activeStage.title}
-              </h3>
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                {activeStage.description}
+              <p className="text-xs text-[#22251F] leading-relaxed italic">
+                &ldquo;{current.decisionExample}&rdquo;
               </p>
             </div>
 
-            {/* Example Student Decision Scenario */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-cyan-400 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                Representative Student Decision
+            {/* Core Pedagogical Takeaway */}
+            <div className="p-3.5 rounded-xl bg-[#F8EFEA] border-l-4 border-l-[#B9684D] border border-[#E5C3B6] text-xs text-[#22251F]">
+              <strong className="text-[#B9684D]">Educational Takeaway: </strong>
+              {current.takeaway}
+            </div>
+          </div>
+
+          {/* Right Column: Stage-Matched Simulation Module */}
+          <div className="lg:col-span-5 p-5 rounded-xl bg-[#FAF8F5] border border-[#D9D5C9] space-y-4">
+            <div className="flex items-center justify-between border-b border-[#D9D5C9] pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#234B3A] font-bold block">
+                  {current.locationNumber}
+                </span>
+                <span className="text-xs font-bold text-[#22251F]">
+                  {current.locationName}
+                </span>
               </div>
-              <p className="text-sm text-slate-200 leading-relaxed font-normal">
-                {activeStage.exampleScenario}
-              </p>
+              <span className="text-[10px] font-mono text-[#234B3A] bg-[#E8F0EC] border border-[#C4D9CD] px-2 py-0.5 rounded-full font-bold">
+                2D Interactive
+              </span>
             </div>
 
-            {/* Expected Learning Concepts & Skills */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                <BookOpen className="w-4 h-4 text-violet-400" />
-                Curricular Learning Concept
+            <div className="space-y-1.5">
+              <div className="text-sm font-bold text-[#22251F]">
+                {current.simulatedScope}
               </div>
-              <p className="text-sm font-semibold text-violet-300 bg-violet-950/30 border border-violet-900/40 p-3 rounded-xl">
-                {activeStage.learningConcept}
-              </p>
+              <div className="text-xs text-[#575952] leading-relaxed">
+                {current.scopeDetails}
+              </div>
+            </div>
 
-              <div className="flex flex-wrap gap-2 pt-1">
-                {activeStage.keySkills.map((skill, sIdx) => (
-                  <span
-                    key={sIdx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300"
-                  >
-                    <CheckCircle2 className="w-3 h-3 text-cyan-400" />
-                    {skill}
-                  </span>
+            {/* Stage-Matched Telemetry Metrics */}
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#D9D5C9]">
+              {current.metrics.map((m) => (
+                <div key={m.label} className="p-2 rounded-lg bg-[#FFFFFF] border border-[#D9D5C9] space-y-0.5">
+                  <div className="text-[10px] text-[#7E8078] truncate">{m.label}</div>
+                  <div className="text-xs font-bold text-[#22251F] font-mono">{m.value}</div>
+                  <div className="text-[9px] font-mono text-[#234B3A] truncate font-medium">{m.change}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex items-center justify-between">
+              <div className="flex gap-1">
+                {stages.map((_, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setActiveStage(i)}
+                    className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
+                      activeStage === i ? 'bg-[#234B3A] scale-125' : 'bg-[#D9D5C9]'
+                    }`}
+                  />
                 ))}
               </div>
-            </div>
-
-            {/* Prev / Next Stage Stepper */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-800/80">
-              <button
-                disabled={activeStageIndex === 0}
-                onClick={() => setActiveStageIndex(c => Math.max(0, c - 1))}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors border border-slate-800"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Previous Stage
-              </button>
-
-              <span className="text-xs font-mono text-slate-500">
-                Stage {activeStageIndex + 1} of {JOURNEY_STAGES.length}
-              </span>
 
               <button
-                disabled={activeStageIndex === JOURNEY_STAGES.length - 1}
-                onClick={() => setActiveStageIndex(c => Math.min(JOURNEY_STAGES.length - 1, c + 1))}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-30 disabled:pointer-events-none transition-colors shadow-sm shadow-cyan-900/40"
+                onClick={() => onOpenSimulation(current.locationId)}
+                className="btn-primary text-xs py-2 px-3"
               >
-                Next Stage
+                <span>{current.ctaText}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
-          {/* Right Column: Dynamic Interactive Preview for this stage */}
-          <div className="lg:col-span-6">
-            <div className="rounded-2xl bg-slate-950/80 border border-slate-800/90 p-5 sm:p-6 shadow-xl relative">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-                <div>
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                    {activeStage.interactionTitle}
-                  </h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    {activeStage.interactionDescription}
-                  </p>
-                </div>
-              </div>
-
-              {/* Renders stage-specific interactive preview */}
-              <JourneyInteractivePreview stageId={activeStage.id} />
-            </div>
-          </div>
         </div>
       </div>
+
     </section>
   );
 };
